@@ -1,0 +1,196 @@
+@startuml SmartCityUML
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #000000
+
+title Smart City Delivery & Traffic Management System - Class Diagram
+
+' ========== DATA STRUCTURES ==========
+class Graph {
+    - adjList : unordered_map<int, vector<pair<int,double>>>
+    ---
+    + addEdge(u, v, weight) : void
+    + removeEdge(u, v) : void
+    + updateWeight(u, v, weight) : void
+    + BFS(start) : vector<int>
+    + DFS(start) : vector<int>
+    + Dijkstra(start) : vector<double>
+    + BellmanFord(start) : vector<double>
+    + PrimMST() : vector<pair<int,int>>
+    + KruskalMST() : vector<pair<int,int>>
+    + TopologicalSort() : vector<int>
+}
+
+class QuadTree {
+    - root : QuadTreeNode*
+    ---
+    + insert(point, data) : void
+    + nearestNeighbor(point) : pair<point, data>
+    + searchRadius(center, radius) : vector<data>
+}
+
+class BST {
+    - root : BSTNode*
+    ---
+    + insert(value) : void
+    + search(value) : BSTNode*
+    + remove(value) : void
+    + inorder() : vector<int>
+}
+
+class SegmentTree {
+    - tree : vector<int>
+    ---
+    + build(arr) : void
+    + query(l, r) : int
+    + update(index, value) : void
+}
+
+class DeliveryPriorityQueue {
+    - heap : priority_queue<Delivery>
+    ---
+    + insert(delivery) : void
+    + extractMax() : Delivery
+    + updatePriority(deliveryId, priority) : void
+}
+
+' ========== MODELS ==========
+class Location {
+    - id : int
+    - name : string
+    - x : double
+    - y : double
+    - type : string
+}
+
+class Vehicle {
+    - id : int
+    - capacity : double
+    - speed : double
+    - currentLocation : int
+    - available : bool
+}
+
+class Customer {
+    - id : int
+    - name : string
+    - address : string
+    - phone : string
+}
+
+class Delivery {
+    - id : int
+    - customerId : int
+    - pickupLocation : int
+    - dropoffLocation : int
+    - deadline : datetime
+    - priority : int
+    - status : string
+}
+
+class Road {
+    - from : int
+    - to : int
+    - weight : double
+}
+
+class TrafficEvent {
+    - id : int
+    - roadId : int
+    - severity : int
+    - density : double
+    - timestamp : datetime
+}
+
+' ========== MANAGERS ==========
+class EntityManager {
+    - locations : unordered_map<int, Location>
+    - vehicles : unordered_map<int, Vehicle>
+    - customers : unordered_map<int, Customer>
+    - deliveries : unordered_map<int, Delivery>
+    ---
+    + addLocation(location) : void
+    + addVehicle(vehicle) : void
+    + addCustomer(customer) : void
+    + addDelivery(delivery) : void
+    + getLocation(id) : Location
+    + getVehicle(id) : Vehicle
+    + getCustomer(id) : Customer
+    + getDelivery(id) : Delivery
+}
+
+class CityMapManager {
+    - graph : Graph
+    ---
+    + loadCity(filepath) : void
+    + updateTraffic(trafficEvent) : void
+    + findShortestPath(from, to) : vector<int>
+}
+
+class SpatialQueryEngine {
+    - quadTree : QuadTree
+    ---
+    + findNearestVehicle(location) : Vehicle
+    + findLocationsInRadius(center, radius) : vector<Location>
+}
+
+class DeliveryScheduler {
+    - pq : DeliveryPriorityQueue
+    ---
+    + scheduleDelivery(delivery) : void
+    + updatePriority(deliveryId, priority) : void
+    + assignVehicle(delivery) : Vehicle
+}
+
+' ========== ALGORITHMS ==========
+class DataProcessor {
+    ---
+    + mergeSort(arr) : vector<int>
+    + quickSort(arr) : vector<int>
+    + binarySearch(arr, target) : int
+    + closestPair(points) : pair<Point, Point>
+}
+
+class RouteOptimizer {
+    ---
+    + optimizeRoute(deliveries, vehicle) : vector<int>
+    + assignVehicles(deliveries, vehicles) : map<int,vector<int>>
+    + selectDeliveries(deliveries, capacity) : vector<int>
+    + fractionalKnapsack(items, capacity) : double
+}
+
+' ========== RELATIONSHIPS ==========
+
+' EntityManager uses models
+EntityManager --> Location : stores
+EntityManager --> Vehicle : stores
+EntityManager --> Customer : stores
+EntityManager --> Delivery : stores
+
+' DeliveryScheduler uses DeliveryPriorityQueue
+DeliveryScheduler --> DeliveryPriorityQueue : uses
+DeliveryScheduler --> Delivery : manages
+
+' CityMapManager uses Graph
+CityMapManager --> Graph : contains
+CityMapManager --> Road : builds from
+
+' SpatialQueryEngine uses QuadTree
+SpatialQueryEngine --> QuadTree : contains
+SpatialQueryEngine --> Location : queries
+
+' Scheduling and Optimization flow
+EntityManager --> DeliveryScheduler : provides deliveries to
+DeliveryScheduler --> RouteOptimizer : optimizes with
+EntityManager --> RouteOptimizer : provides vehicles to
+SpatialQueryEngine --> DeliveryScheduler : locates vehicles for
+
+' Data processing
+DataProcessor --> Delivery : sorts
+CityMapManager --> DataProcessor : uses for analysis
+
+' Traffic events
+TrafficEvent --|> CityMapManager : updates
+
+@enduml

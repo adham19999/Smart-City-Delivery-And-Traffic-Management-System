@@ -1,0 +1,242 @@
+# Smart City System - ASCII UML Diagram
+
+## System Architecture Overview
+
+```
+                              DATA STRUCTURES
+                                    
+                     ┌─────────────────────────────┐
+                     │        Graph                │
+                     ├─────────────────────────────┤
+                     │ adjList (adjacency matrix)  │
+                     ├─────────────────────────────┤
+                     │ • addEdge/removeEdge        │
+                     │ • BFS/DFS traversals        │
+                     │ • Dijkstra/BellmanFord      │
+                     │ • PrimMST/KruskalMST        │
+                     │ • TopologicalSort           │
+                     └─────────────────────────────┘
+                                  △
+                                  │
+                                  │ contains
+                                  │
+                     ┌─────────────────────────────┐
+                     │   CityMapManager            │
+                     ├─────────────────────────────┤
+                     │ - Graph graph               │
+                     ├─────────────────────────────┤
+                     │ • loadCity()                │
+                     │ • updateTraffic()           │
+                     │ • findShortestPath()        │
+                     └─────────────────────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+                            ENTITY MANAGEMENT
+
+                     ┌─────────────────────────────┐
+                     │   EntityManager             │
+                     ├─────────────────────────────┤
+                     │ - locations: map            │
+                     │ - vehicles: map             │
+                     │ - customers: map            │
+                     │ - deliveries: map           │
+                     ├─────────────────────────────┤
+                     │ • add/get Locations         │
+                     │ • add/get Vehicles          │
+                     │ • add/get Customers         │
+                     │ • add/get Deliveries        │
+                     └─────────────────────────────┘
+                                  │
+                 ┌────────────────┼────────────────┐
+                 │                │                │
+                 ▼                ▼                ▼
+        ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+        │  Location    │  │  Vehicle     │  │  Delivery    │
+        ├──────────────┤  ├──────────────┤  ├──────────────┤
+        │ - id         │  │ - id         │  │ - id         │
+        │ - name       │  │ - capacity   │  │ - customerId │
+        │ - x, y       │  │ - speed      │  │ - pickup     │
+        │ - type       │  │ - currentLoc │  │ - dropoff    │
+        │              │  │ - available  │  │ - deadline   │
+        │              │  │              │  │ - priority   │
+        └──────────────┘  └──────────────┘  │ - status     │
+                                            └──────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+                          SPATIAL INDEXING
+
+                     ┌─────────────────────────────┐
+                     │   SpatialQueryEngine        │
+                     ├─────────────────────────────┤
+                     │ - QuadTree quadTree         │
+                     ├─────────────────────────────┤
+                     │ • findNearestVehicle()      │
+                     │ • findLocationsInRadius()   │
+                     └─────────────────────────────┘
+                                  │
+                                  │ contains
+                                  │
+                     ┌─────────────────────────────┐
+                     │      QuadTree               │
+                     ├─────────────────────────────┤
+                     │ - root: QuadTreeNode*       │
+                     ├─────────────────────────────┤
+                     │ • insert()                  │
+                     │ • nearestNeighbor()         │
+                     │ • searchRadius()            │
+                     └─────────────────────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+                        SCHEDULING & OPTIMIZATION
+
+    ┌────────────────────────────────────────────────────────┐
+    │                                                        │
+    │    ┌──────────────────────────────────────┐            │
+    │    │   DeliveryScheduler                  │            │
+    │    ├──────────────────────────────────────┤            │
+    │    │ - pq: DeliveryPriorityQueue          │            │
+    │    ├──────────────────────────────────────┤            │
+    │    │ • scheduleDelivery()                 │            │
+    │    │ • updatePriority()                   │            │
+    │    │ • assignVehicle()                    │            │
+    │    └──────────────────────────────────────┘            │
+    │                  │                                      │
+    │                  │ uses                                 │
+    │                  │                                      │
+    │    ┌──────────────────────────────────────┐            │
+    │    │   DeliveryPriorityQueue              │            │
+    │    ├──────────────────────────────────────┤            │
+    │    │ - heap: priority_queue<Delivery>     │            │
+    │    ├──────────────────────────────────────┤            │
+    │    │ • insert()                           │            │
+    │    │ • extractMax()                       │            │
+    │    │ • updatePriority()                   │            │
+    │    └──────────────────────────────────────┘            │
+    │                                                        │
+    └────────────────────────────────────────────────────────┘
+                           │
+                           │ optimizes with
+                           │
+    ┌────────────────────────────────────────────────────────┐
+    │                                                        │
+    │    ┌──────────────────────────────────────┐            │
+    │    │    RouteOptimizer                    │            │
+    │    ├──────────────────────────────────────┤            │
+    │    │ • optimizeRoute()                    │            │
+    │    │ • assignVehicles()                   │            │
+    │    │ • selectDeliveries()                 │            │
+    │    │ • fractionalKnapsack()               │            │
+    │    └──────────────────────────────────────┘            │
+    │                                                        │
+    └────────────────────────────────────────────────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+                        AUXILIARY DATA STRUCTURES
+
+    ┌───────────────┐   ┌────────────────┐   ┌────────────────┐
+    │  BST          │   │  SegmentTree   │   │  DataProcessor │
+    ├───────────────┤   ├────────────────┤   ├────────────────┤
+    │ - root        │   │ - tree: vector │   │ • mergeSort()  │
+    ├───────────────┤   ├────────────────┤   │ • quickSort()  │
+    │ • insert()    │   │ • build()      │   │ • binarySearch│
+    │ • search()    │   │ • query()      │   │ • closestPair()│
+    │ • remove()    │   │ • update()     │   └────────────────┘
+    │ • inorder()   │   └────────────────┘
+    └───────────────┘
+         │                    │
+         │ For deadline       │ For traffic
+         │ sorting            │ queries
+         │                    │
+         └────────────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+                        COMPLETE DATA FLOW
+
+    ┌──────────────┐
+    │ User Input   │
+    └──────┬───────┘
+           │
+           ▼
+    ┌──────────────────────────┐
+    │  EntityManager           │
+    │  (Store all entities)    │
+    └──────┬───────────────────┘
+           │
+           ├──────────────────────────┬──────────────────────┐
+           │                          │                      │
+           ▼                          ▼                      ▼
+    ┌──────────────────┐    ┌──────────────────┐   ┌──────────────────┐
+    │  CityMapManager  │    │  DeliveryScheduler│  │ SpatialQueryEngine│
+    │  (Build graph,   │    │  (Schedule        │  │ (Find nearest    │
+    │   find routes)   │    │   deliveries)     │  │  vehicles)       │
+    └────────┬─────────┘    └────────┬─────────┘  └─────────────────┘
+             │                      │
+             │                      ▼
+             │              ┌──────────────────┐
+             │              │ RouteOptimizer   │
+             │              │ (Optimize routes)│
+             │              └────────┬─────────┘
+             │                       │
+             └───────────┬───────────┘
+                         │
+                         ▼
+                    ┌──────────────┐
+                    │  Output      │
+                    │  • Routes    │
+                    │  • Schedules │
+                    │  • Assign.   │
+                    └──────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+## 11 Main Classes Summary
+
+┌────┬──────────────────────┬─────────────────────────────────┐
+│ #  │ Class Name           │ Primary Role                    │
+├────┼──────────────────────┼─────────────────────────────────┤
+│ 1  │ EntityManager        │ Entity storage & retrieval      │
+│ 2  │ Graph                │ Pathfinding & topology          │
+│ 3  │ QuadTree             │ Spatial indexing                │
+│ 4  │ BST                  │ Deadline sorting                │
+│ 5  │ SegmentTree          │ Traffic range queries           │
+│ 6  │ DeliveryPriorityQueue│ Priority management             │
+│ 7  │ DeliveryScheduler    │ Delivery scheduling             │
+│ 8  │ CityMapManager       │ Map management                  │
+│ 9  │ SpatialQueryEngine   │ Spatial queries                 │
+│ 10 │ DataProcessor        │ Sorting & searching             │
+│ 11 │ RouteOptimizer       │ Route optimization              │
+└────┴──────────────────────┴─────────────────────────────────┘
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+## Graph Class - Algorithm Coverage
+
+The Graph class implements a comprehensive set of algorithms:
+
+TRAVERSAL          SHORTEST PATH      MST ALGORITHMS     DAG OPERATIONS
+├─ BFS()           ├─ Dijkstra()       ├─ PrimMST()        └─ TopologicalSort()
+└─ DFS()           └─ BellmanFord()    └─ KruskalMST()
+
+This single class covers ~50% of the project's algorithmic requirements!
+
+
+═════════════════════════════════════════════════════════════════════════════

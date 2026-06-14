@@ -1,0 +1,12 @@
+# locations.txt
+# Format: id  name  x  y  type
+1  CentralHub      50.0  50.0  Warehouse
+2  NorthDepot      50.0  80.0  Depot
+3  EastStation     80.0  65.0  Intersection
+4  NorthEast       80.0  90.0  Intersection
+5  MidCity         65.0  50.0  Intersection
+6  EastDistrict    90.0  50.0  Delivery
+7  SouthEast       90.0  30.0  Delivery
+8  SouthDistrict   70.0  20.0  Delivery
+9  WestSouth       40.0  20.0  Delivery
+10 WestDepot       20.0  35.0  Depot

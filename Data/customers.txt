@@ -1,0 +1,5 @@
+# customers.txt
+# Format: id  name  address  phone
+1  Alice_Smith    123_Main_St     555-0101
+2  Bob_Johnson    456_Oak_Ave     555-0102
+3  Carol_Williams 789_Pine_Rd     555-0103
