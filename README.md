@@ -4,7 +4,7 @@ A comprehensive C++ system for managing city deliveries and traffic optimization
 
 ## System Overview
 
-![System Architecture](delivery_system.svg)
+![System Architecture](uml.svg)
 
 ## Project Structure
 
